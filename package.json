@@ -1,0 +1,27 @@
+{
+  "name": "webpush-server",
+  "version": "0.0.1",
+  "description": "A reference Web Push server.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kitcambridge/node-webpush-server.git"
+  },
+  "author": "Kit Cambridge <github@kitcambridge.be> (http://kitcambridge.be/)",
+  "license": "MPL 2.0",
+  "bugs": {
+    "url": "https://github.com/kitcambridge/node-webpush-server/issues"
+  },
+  "homepage": "https://github.com/kitcambridge/node-webpush-server",
+  "dependencies": {
+    "http2": "^3.0.1",
+    "hapi": "^8.0.0-rc9",
+    "boom": "^2.6.1",
+    "iron": "^2.1.2",
+    "node-uuid": "^1.4.2",
+    "joi": "^5.0.2",
+    "lodash": "^2.4.1",
+    "patient-stream": "^1.0.0",
+    "minimist": "^1.1.0"
+  }
+}
