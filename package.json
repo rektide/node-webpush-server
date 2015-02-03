@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "A reference Web Push server.",
   "main": "index.js",
+  "bin": "./bin/webpush-server",
   "repository": {
     "type": "git",
     "url": "git://github.com/kitcambridge/node-webpush-server.git"
@@ -14,8 +15,8 @@
   },
   "homepage": "https://github.com/kitcambridge/node-webpush-server",
   "dependencies": {
-    "http2": "^3.0.1",
-    "hapi": "^8.0.0-rc9",
+    "http2": "^3.1.1",
+    "hapi": "^8.1.0",
     "boom": "^2.6.1",
     "iron": "^2.1.2",
     "node-uuid": "^1.4.2",

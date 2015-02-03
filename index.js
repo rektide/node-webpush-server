@@ -28,7 +28,8 @@ function createServer(options) {
     });
     server.connection({
         port: options.port,
-        listener: new http2.Server(listenerOpts)
+        listener: new http2.Server(listenerOpts),
+        tls: true
     });
     server.app.manager = new Manager();
     server.route(routes);
