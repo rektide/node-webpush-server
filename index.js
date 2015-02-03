@@ -44,6 +44,7 @@ function main() {
         if (err) {
             throw err;
         }
+        console.log('Listening on %s...', server.info.uri);
     });
 }
 
