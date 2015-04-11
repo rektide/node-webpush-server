@@ -5,7 +5,7 @@ var hapi = require('hapi');
 var http2 = require('http2');
 var minimist = require('minimist');
 
-var Manager = require('./lib/manager');
+var Context = require('./lib/context');
 var routes = require('./lib/routes');
 
 function createServer(options) {
@@ -34,7 +34,7 @@ function createServer(options) {
         listener: new http2.Server(listenerOpts),
         tls: true
     });
-    server.app.manager = new Manager();
+    server.bind(new Context());
     server.route(routes);
     return server;
 }

@@ -1,6 +1,6 @@
 # Web Push Server
 
-This is a Node [Web Push](https://martinthomson.github.io/drafts/draft-thomson-webpush-http2.html) server implementation.
+This is a Node [Web Push](https://unicorn-wg.github.io/webpush-protocol/) server implementation.
 
 ## Getting Started
 
@@ -22,35 +22,39 @@ Example usage:
 
 ## API
 
-### `POST /devices`
+### `POST /subscribe`
 
-This is the **push service** resource specified by draft-02, or the **push server URL** from draft-01. A client registers itself with the server by requesting this resource. The server allocates "registration" (`urn:ietf:params:push:reg`) and "subscribe" (`urn:ietf:params:push:sub`) resources, and includes them in the response as link relations.
+This is the **push service** resource. A user agent creates a new subscription for an application by requesting this resource.  The server allocates "subscription," "push" (`urn:ietf:params:push:message`) and "receipt subscribe" (`urn:ietf:params:push:receipt:subscribe`) resources. The "subscription" resource is included in the `Location` response header; the "push" and "receipt subscribe" resources are included as link relations.
 
-The "registration" and "subscribe" resources were called "monitor" (`...:push:monitor`) and "channel" (`...:push:channel`), respectively, in draft-01.
+The application server uses the "push" resource to deliver push messages to the user agent, and the "receipt subscribe" resource to receive acknowledgements. Meanwhile, the user agent uses the "subscription" resource to receive pushed messages.
 
-### `GET /devices/{regId}`
+### `GET /s/{subId}`
 
-This is the **registration** resource specified by draft-02, or the **monitor** resource from draft-01. A client requests this resource to receive push messages. Messages sent by the application server are serialized as HTTP/2 `PUSH_PROMISE` frames for `GET` requests to the associated "subscription" resource.
+This is the **subscription** resource, used by the user agent to receive push messages. Once the user agent requests this resource, messages sent to the corresponding "push" resource will be wrapped in HTTP/2 `PUSH_PROMISE` frames and delivered to the user agent. The `:path` pseudo-header will be set to the push message URL.
 
-### `POST /devices/{regId}/channels`
+The user agent may specify a `Prefer: wait=0` header to request immediate delivery of all stored messages. If no messages are available, the server will return a 204 (No Content) response.
 
-This is the **subscribe** resource specified by draft-02, or the **channel** resource from draft-01. A registered client creates a new subscription by requesting this resource. The server allocates a "subscription" (`urn:ietf:params:push`) resource, and includes it in the response as a link relation. The `Location` header contains the channel URI for the application server.
+### `DELETE /s/{subId}`
 
-Note that draft-02 subsumes the subscription and channel URIs under the "subscription" resource, while this implementation provides a separate channel URI. In draft-02, the URIs included in the `Link: <...>; rel="urn:ietf:params:push"` and `Location` headers are equivalent.
+The user agent requests this resource to delete an active subscription.
 
-### `GET /devices/{regId}/channels/{subId}`
+### `POST /p/{subToken}`
 
-This is the **subscription** resource specified by draft-02. A client can fetch the last message sent by an application server for a subscription by requesting this resource. If the server does not store messages, a 204 (No Content) response is returned.
+This is the **push** resource, used by the application server to deliver messages to the user agent. The subscription information is encoded into the `subToken` to prevent application servers from correlating or tampering with subscriptions. Returns a 201 (Created) response if the message is accepted. The `Location` header contains the push message URL.
 
-This implementation does not currently store messages; incoming messages will be dropped if the client is not holding open a request to the registration resource.
+If the application server includes a `TTL` request header, the user agent is offline, and the push service supports storage, the message will be stored for, at most, the given number of seconds. This is advisory only; the `TTL` response header specifies the actual message time-to-live. If the push server does not support storage, and a `TTL` request header is specified, the response header will always be `0`.
 
-### `DELETE /devices/{regId}/channels/{subId}`
+### `DELETE /d/{updateToken}`
 
-This deletes an active subscription. Since messages are not currently stored, requesting this resource is a no-op.
+The user agent requests this resource to acknowledge received messages.
 
-### `PUT /updates/{key}`
+### `POST /receipts/{subToken}`
 
-This is the resource allocated by the subscribe resource for the application server. The registration and subscription information is encoded into the opaque `key` to prevent application servers from correlating subscriptions for a client.
+This is the **receipt subscribe** resource, used by the application server to create a receipt subscription resource. Servers may create multiple receipt subscriptions per push service subscription. The `Push-Receipt` push request header indicates the subscription to use for delivering the receipt.
+
+### `GET /r/{receiptToken}`
+
+This is the **receipt subscription** resource, used by the application server to receive acknowledgements. Acknowledgements are serialized as HTTP/2 `PUSH_PROMISE` frames, with the `:path` pseudo-header set to the acknowledged push message URL.
 
 ## License
 
