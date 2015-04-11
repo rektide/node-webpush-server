@@ -14,12 +14,11 @@ This installs a `webpush-server` executable that can be used to start the server
 * `--key` (String): The path to a PEM-encoded TLS certificate.
 * `--cert` (String): The private key for the given certificate.
 * `--pfx` (String): The combined certificate, private key, and CA certs in PFX format. Mutually exclusive with `--key` and `--cert`.
+* `--h2c` (Boolean): Enable HTTP/2 over TCP. Mutually exclusive with `--key`, `--cert`, and `--pfx`. The [Node HTTP/2 library](https://github.com/molnarg/node-http2) does not currently implement the `Upgrade` mechanism for HTTP/2, so HTTP/1.1 clients will be rejected if this option is specified.
 
 Example usage:
 
     $ webpush-server --port 8080 --key keys/key.pem --cert keys/cert.pem
-
-The [Node HTTP/2 library](https://github.com/molnarg/node-http2) does not currently implement the `Upgrade` mechanism for HTTP/2, so TLS keys must be provided.
 
 ## API
 

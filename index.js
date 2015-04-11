@@ -15,12 +15,15 @@ function createServer(options) {
     assert(isFinite(port), 'The server port must be a number');
 
     var listenerOpts = {};
-    assert(!!(options.key && options.cert) ^ options.pfx, 'Missing or invalid server keys');
+    var hasKeys = !!(options.key && options.cert) ^ options.pfx;
+    assert(hasKeys ^ options.h2c, 'Missing or invalid server keys');
     if (options.pfx) {
         listenerOpts.pfx = fs.readFileSync(options.pfx);
-    } else {
+    } else if (options.key) {
         listenerOpts.key = fs.readFileSync(options.key);
         listenerOpts.cert = fs.readFileSync(options.cert);
+    } else {
+        listenerOpts.plain = true;
     }
 
     var server = new hapi.Server({
