@@ -48,6 +48,10 @@ If the application server includes a `TTL` request header, the user agent is off
 
 The user agent requests this resource to acknowledge received messages.
 
+### `PUT /d/{updateToken}`
+
+The application server uses this resource to update pending messages.
+
 ### `POST /receipts/{subToken}`
 
 This is the **receipt subscribe** resource, used by the application server to create a receipt subscription resource. Servers may create multiple receipt subscriptions per push service subscription. The `Push-Receipt` push request header indicates the subscription to use for delivering the receipt.
