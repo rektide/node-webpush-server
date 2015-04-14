@@ -27,7 +27,14 @@ function createServer(options) {
     }
 
     var server = new hapi.Server({
-        minimal: true
+        minimal: true,
+        connections: {
+            routes: {
+                payload: {
+                    failAction: 'ignore'
+                }
+            }
+        }
     });
     server.connection({
         port: options.port,
