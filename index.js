@@ -1,17 +1,15 @@
 var assert = require('assert');
 var fs = require('fs');
 
-var hapi = require('hapi');
-var http2 = require('http2');
 var minimist = require('minimist');
 
 var Context = require('./lib/context');
-var routes = require('./lib/routes');
+var createServer = require('./lib');
 
-function createServer(options) {
+function serverWithFlags(options) {
     assert(options && typeof options == 'object', 'Missing server options');
 
-    var port = options.port;
+    var port = +options.port;
     assert(isFinite(port), 'The server port must be a number');
 
     var listenerOpts = {};
@@ -26,29 +24,16 @@ function createServer(options) {
         listenerOpts.plain = true;
     }
 
-    var server = new hapi.Server({
-        minimal: true,
-        connections: {
-            routes: {
-                payload: {
-                    failAction: 'ignore'
-                }
-            }
-        }
-    });
-    server.connection({
-        port: options.port,
-        listener: new http2.Server(listenerOpts),
-        tls: true
-    });
-    server.bind(new Context());
-    server.route(routes);
-    return server;
+    return createServer(null, port, listenerOpts, new Context({
+        password: 'we7/1KKJDezJ17izLZWf4g==',
+        storagePath: './db',
+        db: require('leveldown')
+    }));
 }
 
 function main() {
     var flags = minimist(process.argv.slice(2));
-    var server = createServer(flags);
+    var server = serverWithFlags(flags);
 
     server.start(function afterStart(err) {
         if (err) {
