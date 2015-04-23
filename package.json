@@ -24,6 +24,8 @@
     "lodash": "^3.6.0",
     "minimist": "^1.1.1",
     "levelup": "^0.19.0",
-    "leveldown": "^0.10.4"
+    "leveldown": "^0.10.4",
+    "qs": "^2.4.1",
+    "wreck": "^5.4.0"
   }
 }

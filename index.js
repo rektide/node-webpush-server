@@ -3,6 +3,7 @@ var fs = require('fs');
 
 var minimist = require('minimist');
 
+var bridges = require('./lib/bridges');
 var Context = require('./lib/context');
 var createServer = require('./lib');
 
@@ -24,22 +25,35 @@ function serverWithFlags(options) {
         listenerOpts.plain = true;
     }
 
-    return createServer(null, port, listenerOpts, new Context({
+    var contextOpts = {
         password: 'we7/1KKJDezJ17izLZWf4g==',
         storagePath: './db',
         db: require('leveldown')
-    }));
+    };
+    var context;
+    if (options.udp === true) {
+        contextOpts.baseURL = 'http://localhost:8000';
+        context = new bridges.UDPBridge(contextOpts);
+    } else if (options.gcm === true) {
+        contextOpts.baseURL = 'https://android.googleapis.com';
+        context = new bridges.GCMBridge(contextOpts);
+    } else {
+        context = new Context(contextOpts);
+    }
+    return createServer(null, port, listenerOpts, context);
 }
 
 function main() {
     var flags = minimist(process.argv.slice(2));
     var server = serverWithFlags(flags);
 
-    server.start(function afterStart(err) {
-        if (err) {
-            throw err;
-        }
-        console.log('Listening on %s...', server.info.uri);
+    var context = server.realm.settings.bind;
+    context.start(function afterContextStart(err) {
+        assert.ifError(err);
+        server.start(function afterServerStart(err) {
+            assert.ifError(err);
+            console.log('Listening on %s...', server.info.uri);
+        });
     });
 }
 
