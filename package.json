@@ -9,7 +9,7 @@
     "url": "git://github.com/kitcambridge/node-webpush-server.git"
   },
   "author": "Kit Cambridge <github@kitcambridge.be> (http://kitcambridge.be/)",
-  "license": "MPL 2.0",
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/kitcambridge/node-webpush-server/issues"
   },
